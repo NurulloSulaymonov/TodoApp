@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Infrastructure.Data.Dtos;
 
@@ -7,11 +8,13 @@ public class TodoService
 {
     private readonly DataContext _context;
     private readonly IWebHostEnvironment _environment;
+    private readonly IMapper _mapper;
 
-    public TodoService(DataContext context, IWebHostEnvironment environment)
+    public TodoService(DataContext context, IWebHostEnvironment environment,IMapper mapper)
     {
         _context = context;
         _environment = environment;
+        _mapper = mapper;
     }
     
     public async Task<List<Todo>> GetAllAsync()
@@ -34,41 +37,17 @@ public class TodoService
 
     public async Task<GetTodoDto> AddTodo(AddTodoDto todo)
     {
-        var response = new GetTodoDto()
-        {
-            Description = todo.Description,
-            Id = todo.Id,
-            Title = todo.Title,
-            ImageName = todo.Image.FileName
-        };
-        
-        // logic
-        var newTodo = new Todo()
-        {
-            Description = todo.Description,
-            Id = todo.Id,
-            Title = todo.Title,
-            ImageName = todo.Image.FileName
-        };
-
+        var newTodo = _mapper.Map<Todo>(todo);
         //save file 
         newTodo.ImageName = await UploadFile(todo.Image);
         _context.Todos.Add(newTodo);
         await _context.SaveChangesAsync();
 
-        return response;
+        return _mapper.Map<GetTodoDto>(newTodo);
     }
 
     public async Task<GetTodoDto> Update(AddTodoDto todo)
     {
-        var response = new GetTodoDto()
-        {
-            Description = todo.Description,
-            Id = todo.Id,
-            Title = todo.Title,
-            ImageName = todo.Image.FileName
-        };
-        
         // logic
         var find = await _context.Todos.FindAsync(todo.Id);
         find.Description = todo.Description;
@@ -78,8 +57,7 @@ public class TodoService
         {
             find.ImageName = await UpdateFile(todo.Image, find.ImageName);
         }
-        
-        return response;
+        return _mapper.Map<GetTodoDto>(find);
     }
 
     private async Task<string> UploadFile(IFormFile file)
