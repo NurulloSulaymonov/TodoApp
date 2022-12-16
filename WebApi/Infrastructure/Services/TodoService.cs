@@ -17,9 +17,9 @@ public class TodoService
         _mapper = mapper;
     }
     
-    public async Task<List<Todo>> GetAllAsync()
+    public async Task<List<GetTodoDto>> GetAllAsync()
     {
-        return await _context.Todos.ToListAsync();
+        return  _mapper.Map<List<Todo>,List<GetTodoDto>>(await _context.Todos.ToListAsync());
     }
     
     public async Task<GetTodoDto> GetByIdAsync(int id)
@@ -43,7 +43,7 @@ public class TodoService
         _context.Todos.Add(newTodo);
         await _context.SaveChangesAsync();
 
-        return _mapper.Map<GetTodoDto>(newTodo);
+        return  _mapper.Map<GetTodoDto>(newTodo);
     }
 
     public async Task<GetTodoDto> Update(AddTodoDto todo)

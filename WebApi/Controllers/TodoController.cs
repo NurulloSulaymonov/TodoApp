@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Infrastructure.Data.Dtos;
 using WebApi.Infrastructure.Services;
@@ -5,7 +6,7 @@ using WebApi.Infrastructure.Services;
 namespace WebApi.Controllers;
 [ApiController]
 [Route("[controller]")]
-
+[Authorize]
 public class TodoController
 {
     private readonly TodoService _todoService;
@@ -16,7 +17,7 @@ public class TodoController
     }
     
     [HttpGet("GetTodos")]
-    public async Task<List<Todo>> GetAllAsync()
+    public async Task<List<GetTodoDto>> GetAllAsync()
     {
         return await _todoService.GetAllAsync();
     }
