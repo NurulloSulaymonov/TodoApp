@@ -37,8 +37,6 @@ builder.Services.AddAuthentication(options =>
     var key = Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]);
     o.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = false,
-        ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["JWT:Issuer"],
