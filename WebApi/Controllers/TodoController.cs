@@ -23,6 +23,7 @@ public class TodoController
     }
 
     [HttpGet("GetById")]
+    [Authorize(Roles = "Admin")]
     public async Task<GetTodoDto> GetById(int id)
     {
         return await _todoService.GetByIdAsync(id);
