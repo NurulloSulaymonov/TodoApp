@@ -1,6 +1,8 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Infrastructure.Data.Dtos;
+using WebApi.Infrastructure.Data.Filters;
+using WebApi.Infrastructure.Data.Wrappers;
 
 namespace WebApi.Infrastructure.Services;
 
@@ -17,9 +19,30 @@ public class TodoService
         _mapper = mapper;
     }
     
-    public async Task<List<GetTodoDto>> GetAllAsync()
+    public async Task<PaginationResponse<List<GetTodoDto>>> GetAllAsync(TodoFilter filter)
     {
-        return  _mapper.Map<List<Todo>,List<GetTodoDto>>(await _context.Todos.ToListAsync());
+        // 100 element
+        // pageNumber = 1
+        // pageSize = 10
+        //filter = new TodoFilter(filter.PageNumber, filter.PageSize);
+        var query = _context.Todos.AsQueryable();
+
+            if(filter.Name != null) query = query.Where(x => x.Title.Contains(filter.Name));
+            if (filter.SortAscending != null)
+            {
+                if (filter.SortAscending == true) query = query.OrderBy(x => x.Id);
+            }
+            if(filter.SortDescending != null)
+            {
+                if (filter.SortDescending == true) query = query.OrderByDescending(x => x.Id);
+            }
+            var filtered = query.Skip((filter.PageNumber - 1) * filter.PageSize)
+            .Take(filter.PageSize).ToList();
+        
+            var mapped = _mapper.Map<List<GetTodoDto>>(filtered);
+        var totalRecords = await _context.Todos.CountAsync();
+
+        return new PaginationResponse<List<GetTodoDto>>(mapped, totalRecords, filter.PageSize,filter.PageNumber);
     }
     
     public async Task<GetTodoDto> GetByIdAsync(int id)

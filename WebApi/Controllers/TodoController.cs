@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Infrastructure.Data.Dtos;
+using WebApi.Infrastructure.Data.Filters;
+using WebApi.Infrastructure.Data.Wrappers;
 using WebApi.Infrastructure.Services;
 
 namespace WebApi.Controllers;
 [ApiController]
 [Route("[controller]")]
-[Authorize]
+// [Authorize]
 public class TodoController
 {
     private readonly TodoService _todoService;
@@ -17,10 +19,11 @@ public class TodoController
     }
     
     [HttpGet("GetTodos")]
-    public async Task<List<GetTodoDto>> GetAllAsync()
+    public async Task<PaginationResponse<List<GetTodoDto>>> GetAllAsync([FromQuery]TodoFilter filter)
     {
-        return await _todoService.GetAllAsync();
+        return await _todoService.GetAllAsync(filter);
     }
+    
 
     [HttpGet("GetById")]
     [Authorize(Roles = "Admin")]

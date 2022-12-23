@@ -11,9 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(config =>
+    builder.Services.AddControllers();
+    builder.Services.AddScoped<UserService>();
+    builder.Services.AddIdentity<IdentityUser, IdentityRole>(config =>
     {
         config.Password.RequiredLength = 4;
         config.Password.RequireDigit = false; // must have at least one digit
@@ -21,9 +21,9 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(config =>
         config.Password.RequireUppercase = false; // must have at least one uppercase character
         config.Password.RequireLowercase = false;  // must have at least one lowercase character
     })
-    //for registering usermanager and signinmanger
     .AddEntityFrameworkStores<DataContext>()
     .AddDefaultTokenProviders();
+
 
 
 //jwt config
